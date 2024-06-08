@@ -71,17 +71,11 @@ scene.add(sphere);
 
 //LIGHT
 
-const color = 0xffffff;
-const intensity = 1;
+const color = 0xffecb8;
+const intensity = 0.8;
 const light = new THREE.DirectionalLight(color, intensity);
-light.position.set(0, 30, 30);
+light.position.set(0, 20, 20);
 scene.add(light);
-
-//AMBIENT LIGHT
-const ambientColor = 0xffffff;
-const ambientIntensity = 0.2;
-const ambientLight = new THREE.AmbientLight(ambientColor, ambientIntensity);
-scene.add(ambientLight);
 
 
 
@@ -97,6 +91,7 @@ function animate(time) {
     time *= 0.001
     requestAnimationFrame(animate)
     sphere.rotation.x += 0.005;
+    sphere.rotation.y += 0.005;
     render()
 }
 
