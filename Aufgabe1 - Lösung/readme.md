@@ -2,11 +2,11 @@
 
 Besitzer/-in: Methusshan Elankumaran
 
-# Aufgabenstellung:
+## Aufgabenstellung:
 
 **Erstelle eine Szene in three.js, die einen Würfel beinhaltet, die drei sich im Textur-Ordner befindenden Texturen enthält. Lasse diesen sich kontinuierlich um die X- und Y-Achse drehen. Füge ein Directional Light hinzu, welches auf die Kugel zeigt. Wrapping-Einstellungen für die Texturen können selbst gewählt werden.**
 
-# Einstellungen:
+## Einstellungen:
 
 Kamera hat folgende Einstellungen:
 
@@ -28,4 +28,5 @@ Directional Light hat folgende Einstellungen:
 - Intensität: 0.8
 - Position: (0,20,20)
 
+## Ergebnis
 ![alt text](result.png)
