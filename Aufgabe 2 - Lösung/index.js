@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js'
 
 var btn, gl, glCanvas, camera, scene, renderer, vaseModel;
-var controller, reticle;
+var reticle;
 
 var xrSession = null;
 var xrViewerPose;
