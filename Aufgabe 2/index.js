@@ -2,13 +2,15 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js'
 
-var btn, gl, glCanvas, camera, scene, renderer, vaseModel;
+var btn, gl, glCanvas, camera, scene, renderer, vaseModel, sphere;
 var reticle;
 
 var xrSession = null;
 var xrViewerPose;
 var hitTestSource = null;
 var hitTestSourceRequested = false;
+
+var spheres = []
 
 loadScene()
 
@@ -76,6 +78,27 @@ function loadScene() {
     renderer.xr.enabled = true
     document.body.appendChild(renderer.domElement)
 
+    //Kugel erstellen
+    const sphereGeometry = new THREE.SphereGeometry(0.1, 32, 32)
+
+//Texturen laden und zur Kugel hinzufügen
+    const textureLoader = new THREE.TextureLoader()
+
+    const brickTexture = textureLoader.load('./textures/brickBaseMap.jpg')
+    const brickNormalMap = textureLoader.load('./textures/brickNormalMap.jpg')
+
+    const sphereMaterial = new THREE.MeshPhongMaterial({
+        map: brickTexture,
+        normalMap: brickNormalMap
+    })
+
+    sphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
+
+    //Lichtquelle erstellen
+    const directionalLight = new THREE.DirectionalLight('#d2ab73', 4)
+    directionalLight.target = sphere
+    scene.add(directionalLight)
+
     navigator.xr.isSessionSupported('immersive-ar')
         .then((supported) => {
             if (supported) {
@@ -108,11 +131,9 @@ function loadScene() {
 
 function onSelect() {
     console.log("on select fired");
-    var clone = vaseModel.clone()
-    clone.scale.x *= 1.5;
-    clone.scale.y *= 1.5;
-    clone.scale.z *= 1.5;
+    var clone = sphere.clone()
     clone.applyMatrix4(reticle.matrix)
+    spheres.push(clone)
     scene.add(clone)
 }
 
@@ -180,6 +201,17 @@ function render(time, frame) {
             reticle.visible = false
         }
     }
+
+    for (const sphere of spheres) {
+        sphere.rotation.x += 0.09
+        sphere.rotation.y -= 0.08
+        sphere.rotation.z += 0.07
+
+        sphere.position.x += 0.01
+        sphere.position.y += 0.02
+        sphere.position.z += 0.03
+    }
+
     renderer.render(scene, camera);
 }
 
