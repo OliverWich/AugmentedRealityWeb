@@ -30,6 +30,10 @@ function loadScene() {
     scene.add(light)
 
     //Erstelle Reticle
+    reticle = new THREE.Mesh(new THREE.RingGeometry(0.15, 0.2, 32).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({color: '#00FF00'}))
+    reticle.matrixAutoUpdate = false
+    reticle.visible = false
+    scene.add(reticle)
 
     const loader = new GLTFLoader()
 
@@ -66,6 +70,11 @@ function loadScene() {
     )
 
     //Erstelle den Renderer
+    renderer = new THREE.WebGLRenderer({canvas: glCanvas, context: gl})
+    renderer.setPixelRatio(window.devicePixelRatio)
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.xr.enabled = true
+    document.body.appendChild(renderer.domElement)
 
     navigator.xr.isSessionSupported('immersive-ar')
         .then((supported) => {
@@ -107,9 +116,15 @@ function onSelect() {
     scene.add(clone)
 }
 
-function onRequestSession() {
-    console.log("requesting session");
+function onRequestSession () {
+    console.log('requesting session')
     //Erstelle einen Request für eine Session
+    navigator.xr.requestSession('immersive-ar', {
+        requiredFeatures: ['hit-test'],
+        optionalFeatures: ['local-floor']
+    }).then(onSessionStarted).catch((reason) => {
+        console.log('request disabled: ' + reason.log)
+    })
 }
 
 function onSessionStarted(session) {
@@ -140,6 +155,32 @@ function animate() {
 
 function render(time, frame) {
     //Erstelle die Render-Funktion
+    if(frame) {
+        var referenceSpace = renderer.xr.getReferenceSpace('local')
+        var session = frame.session
+        xrViewerPose = frame.getViewerPose(referenceSpace)
+        if (hitTestSourceRequested === false) {
+            session.requestReferenceSpace('viewer').then((referenceSpace) => {
+                session.requestHitTestSource({space: referenceSpace}).then((source) => {
+                    hitTestSource = source
+                })
+            })
+            session.addEventListener('end', () => {
+                hitTestSourceRequested = false
+                hitTestSource = null
+            })
+        }
+    } if(hitTestSource) {
+        var hitTestResults = frame.getHitTestResults(hitTestSource)
+        if (hitTestResults.length > 0) {
+            var hit = hitTestResults[0]
+            reticle.visible = true
+            reticle.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix)
+        } else {
+            reticle.visible = false
+        }
+    }
+    renderer.render(scene, camera);
 }
 
 function endXRSession() {
